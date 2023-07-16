@@ -9,27 +9,30 @@ import "../../../css/ReactAreaSelector.css";
 
 type props = {
   image: string | undefined;
+  downloadSelection(x: number, y: number, width: number, height: number): void;
 };
 
 export default function ReactAreaSelector(porps: props) {
   const [areas, setAreas] = useState<IArea[]>([]);
   const [activeArea, setActiveArea] = useState<number | null>(null);
 
-  const handleOnChange = (areas: IArea[]) => {
-    setAreas(areas);
-    setActiveArea(areas.length - 1);
+  const handleOnChange = (a: IArea[]) => {
+    setAreas(a);
+    if (a.length > areas.length) {
+      setActiveArea(areas.length);
+    }
   };
 
-  const handleDelete = (areaNumber: number) => {
+  function handleActiveArea(areaNumber: number): void {
+    setActiveArea(areaNumber);
+  }
+
+  const handleDelete = (areaNumber: number): void => {
     const newAreas: IArea[] = areas.filter(
       (area, index) => index != areaNumber - 1
     );
     setAreas(newAreas);
   };
-
-  function handleActiveArea(areaNumber: number) {
-    setActiveArea(areaNumber);
-  }
 
   const customRender = (areaProps: IAreaRendererProps) => {
     if (!areaProps.isChanging) {
@@ -46,6 +49,15 @@ export default function ReactAreaSelector(porps: props) {
           {areaProps.areaNumber - 1 === activeArea && (
             <ContextMenu
               handleDelete={() => handleDelete(areaProps.areaNumber)}
+              info={areaProps}
+              downloadSelection={() =>
+                porps.downloadSelection(
+                  areaProps.x,
+                  areaProps.y,
+                  areaProps.width,
+                  areaProps.height
+                )
+              }
             />
           )}
         </div>
