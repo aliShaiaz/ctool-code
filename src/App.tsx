@@ -1,10 +1,10 @@
-import ReactImageCrop from "./component/ReactImageCrop";
+import ImageProcessor from "./component/Image-Processor/_ImageProcessor";
 import "./css/App.css";
 
 function App() {
   return (
-    <div className="container">
-      <ReactImageCrop />
+    <div id="container">
+      <ImageProcessor />
     </div>
   );
 }
