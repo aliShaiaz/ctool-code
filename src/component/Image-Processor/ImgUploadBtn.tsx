@@ -38,13 +38,19 @@ const ImgUploadBtn = ({ handleChange, trigger }: props) => {
     <motion.div
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      animate={{
-        scale: [1, 2, 2, 1, 1],
-        rotate: [0, 0, 270, 270, 0],
-        borderRadius: ["20%", "20%", "50%", "50%", "20%"],
-      }}
+      animate={
+        !trigger
+          ? {
+              scale: [1, 2, 2, 1, 1],
+              rotate: [0, 0, 270, 270, 0],
+              borderRadius: ["20%", "20%", "50%", "50%", "20%"],
+            }
+          : { opacity: 1, scale: 1 }
+      }
+      initial={trigger ? { opacity: 0, scale: 0 } : {}}
+      exit={trigger ? { opacity: 0, scale: 0 } : {}}
       id="img-upload-btn"
-      style={trigger ? styles : styles2}
+      style={trigger ? styles2 : styles}
     >
       <input
         className="imgUpload"

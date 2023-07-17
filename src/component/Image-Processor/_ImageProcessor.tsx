@@ -23,6 +23,7 @@ const ImageProcessor = () => {
     setSelectedImage(undefined);
     setScaleRatio(1);
     setAreas([]);
+    setAreasBackup([]);
   }
 
   async function rotateImage(
@@ -306,17 +307,17 @@ const ImageProcessor = () => {
   return (
     <>
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0 }}
         id="image-processor"
       >
         {!selectedImage && (
-          <ImgUploadBtn handleChange={handleImageChange} trigger={true} />
+          <ImgUploadBtn handleChange={handleImageChange} trigger={false} />
         )}
         {selectedImage && (
           <>
-            <ImgUploadBtn handleChange={handleImageChange} trigger={false} />
+            <ImgUploadBtn handleChange={handleImageChange} trigger={true} />
             <ReactAreaSelector
               image={scaledImage}
               downloadSelection={processSelectionCrop}

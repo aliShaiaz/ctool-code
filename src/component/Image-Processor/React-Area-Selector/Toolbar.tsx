@@ -21,7 +21,12 @@ const Toolbar = ({
   handleClearCanvas,
 }: props) => {
   return (
-    <div id="toolbar">
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.5 }}
+      id="toolbar"
+    >
       <input
         type="range"
         id="ratioSlider"
@@ -60,7 +65,7 @@ const Toolbar = ({
           alt="Remove Image"
         />
       </button>
-    </div>
+    </motion.div>
   );
 };
 
