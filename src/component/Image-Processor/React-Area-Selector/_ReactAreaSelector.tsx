@@ -26,17 +26,18 @@ export default function ReactAreaSelector({
   const selectionMinHeight: number = 50;
 
   const handleOnChange = (a: IArea[]) => {
+    // console.log("Calling Selection OnChange");
+
+
     // DEFAULT ACTIONS AFTER MARKING AN AREA //
+    
     // minHeight % minWeight check
-    console.log("calling");
-    if (
-      a[a.length - 1].width < selectionMinWidth ||
-      a[a.length - 1].height < selectionMinHeight
-    ) {
-      a[a.length - 1].width = selectionMinWidth;
+    if (a[a.length - 1].height < selectionMinHeight)
       a[a.length - 1].height = selectionMinHeight;
-    }
+    else if (a[a.length - 1].width < selectionMinWidth)
+      a[a.length - 1].width = selectionMinWidth;
     // . //
+    
     // . . . //
 
     setAreas(a);
