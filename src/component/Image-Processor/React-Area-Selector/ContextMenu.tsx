@@ -17,14 +17,29 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
       className="contextMenu"
     >
       <button className="btn-icon">
-        <img className="icon" src={CustomIcons.Analyze} alt="Analyze" />
+        <img
+          title="Analyze"
+          className="icon"
+          src={CustomIcons.Analyze}
+          alt="Analyze"
+        />
       </button>
       <button className="btn-icon" onClick={handleDelete}>
-        <img className="icon" src={CustomIcons.Delete} alt="Delete" />
+        <img
+          title="Delete"
+          className="icon"
+          src={CustomIcons.Delete}
+          alt="Delete"
+        />
       </button>
-      {/* <button className="btn-icon" onClick={() => console.log(info)}> */}
+      {/* <button title = '' className="btn-icon" onClick={() => console.log(info)}> */}
       <button className="btn-icon" onClick={downloadSelection}>
-        <img className="icon" src={CustomIcons.Download} alt="Delete" />
+        <img
+          title="Download"
+          className="icon"
+          src={CustomIcons.Download}
+          alt="Download"
+        />
       </button>
     </motion.div>
   );
