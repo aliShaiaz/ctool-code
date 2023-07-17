@@ -6,6 +6,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import ContextMenu from "./ContextMenu";
 import "../../../css/ReactAreaSelector.css";
+import { motion } from "framer-motion";
 
 type props = {
   image: string | undefined;
@@ -81,7 +82,12 @@ export default function ReactAreaSelector(porps: props) {
   }, [escFunction]);
 
   return (
-    <div id="react-area-selector">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      id="react-area-selector"
+    >
       <AreaSelector
         areas={areas}
         onChange={handleOnChange}
@@ -91,6 +97,6 @@ export default function ReactAreaSelector(porps: props) {
           <img id="selected-image" src={porps.image} alt="my image" />
         )}
       </AreaSelector>
-    </div>
+    </motion.div>
   );
 }

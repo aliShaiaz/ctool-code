@@ -1,5 +1,6 @@
+import { motion } from "framer-motion";
 import "../../css/ImgUploadBtn.css";
-import { CustomIcons } from "../../files/_index";
+import { CustomIcons } from "../../icons/_index";
 
 type props = {
   handleChange(event: React.ChangeEvent<HTMLInputElement>): void;
@@ -7,7 +8,11 @@ type props = {
 
 const ImgUploadBtn = (props: props) => {
   return (
-    <div id="img-upload-btn">
+    <motion.div
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      id="img-upload-btn"
+    >
       <input
         className="imgUpload"
         id="imgUpload"
@@ -16,7 +21,7 @@ const ImgUploadBtn = (props: props) => {
         onChange={props.handleChange}
       />
       <label htmlFor="imgUpload">Load Image</label>
-    </div>
+    </motion.div>
   );
 };
 

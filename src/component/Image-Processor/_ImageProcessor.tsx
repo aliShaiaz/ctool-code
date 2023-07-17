@@ -3,6 +3,7 @@ import ImgUploadBtn from "./ImgUploadBtn";
 
 import "../../css/ImageProcessor.css";
 import ReactAreaSelector from "./React-Area-Selector/_ReactAreaSelector";
+import { motion } from "framer-motion";
 
 const ImageProcessor = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(
@@ -208,7 +209,12 @@ const ImageProcessor = () => {
 
   return (
     <>
-      <div id="image-processor">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        id="image-processor"
+      >
         <ImgUploadBtn handleChange={handleImageChange} />
         {selectedImage && (
           <ReactAreaSelector
@@ -227,7 +233,7 @@ const ImageProcessor = () => {
             processImageRatio();
           }}
         />
-      </div>
+      </motion.div>
     </>
   );
 };

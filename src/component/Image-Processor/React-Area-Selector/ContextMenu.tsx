@@ -1,5 +1,6 @@
-import { CustomIcons } from "../../../files/_index";
+import { CustomIcons } from "../../../icons/_index";
 import "../../../css/ContextMenu.css";
+import { motion } from "framer-motion";
 
 type props = {
   handleDelete(): void;
@@ -9,7 +10,12 @@ type props = {
 
 const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
   return (
-    <div className="contextMenu">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="contextMenu"
+    >
       <button className="btn-icon">
         <img className="icon" src={CustomIcons.Analyze} alt="Analyze" />
       </button>
@@ -20,7 +26,7 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
       <button className="btn-icon" onClick={downloadSelection}>
         <img className="icon" src={CustomIcons.Download} alt="Delete" />
       </button>
-    </div>
+    </motion.div>
   );
 };
 
