@@ -14,7 +14,7 @@ const ImageProcessor = () => {
   const [scaledImage, setScaledImage] = useState<string | undefined>(undefined);
   const [scaleRatio, setScaleRatio] = useState<number>(1);
   const [areas, setAreas] = useState<IArea[]>([]);
-  const [scaledAreas, setScaledAreas] = useState<IArea[]>([]);
+  const [areasBackup, setAreasBackup] = useState<IArea[]>([]);
 
   // R & D Zone //
   async function rotateImage(
@@ -95,7 +95,7 @@ const ImageProcessor = () => {
   }
 
   function handleResetSelection(): void {
-    setScaledAreas([]);
+    setAreas([]);
   }
 
   // . . . //
@@ -163,39 +163,45 @@ const ImageProcessor = () => {
   }
 
   async function scaleSelections(
-    Selections: IArea[],
+    selections: IArea[],
     scale: number
   ): Promise<IArea[]> {
-    Selections.forEach((selection) => {
-      // selection.width = selection.width * scale;
-      // selection.x *= scale;
-      // selection.y *= scale;
-      selection.width *= scale;
-      selection.height *= scale;
+    return selections.map((selection) => {
+      return {
+        ...selection,
+        x: selection.x * scale,
+        y: selection.y * scale,
+        width: selection.width * scale,
+        height: selection.height * scale,
+      };
     });
-    return Selections;
   }
 
   async function handleSetAreas(newAreas: IArea[]): Promise<void> {
-    // setAreas(newAreas);
-    setScaledAreas(newAreas);
-    setAreas(await scaleSelections(newAreas, scaleRatio));
+    // setScaledAreas(newAreas);
+    // setAreas(await scaleSelections(newAreas, scaleRatio));
+
+    setAreas(newAreas);
+    setAreasBackup(await scaleSelections(newAreas, scaleRatio));
   }
 
   async function processImageRatio() {
-    if(selectedImage){
+    if (selectedImage) {
       try {
         const scale = scaleRatio; // Specify the desired scale factor
-  
+
         // Call the scaleImage function with the selected image URL
         const scaledImage = await scaleImage(selectedImage!, scale);
-  
+
         // Call the scaleSelection function with all selections 'areas' and the ratio
-        // const newScaledAreas: IArea[] = await scaleSelections(areas, scale);
-  
+        const newScaledAreas: IArea[] = await scaleSelections(
+          areasBackup,
+          scale
+        );
+
         // Update the state with the scaled image
         setScaledImage(scaledImage.toDataURL()); // Assuming you want to store the scaled image as a data URL
-        // setScaledAreas(newScaledAreas);
+        setAreas(newScaledAreas);
       } catch (error) {
         console.error("Error scaling image:", error);
       }
@@ -303,7 +309,7 @@ const ImageProcessor = () => {
             image={scaledImage}
             downloadSelection={processSelectionCrop}
             areas={areas}
-            setAreas={setAreas}
+            setAreas={handleSetAreas}
           />
         )}
         <Toolbar

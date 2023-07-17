@@ -1,10 +1,11 @@
 import { CustomIcons } from "../../../icons/_index";
 import "../../../css/ContextMenu.css";
 import { motion } from "framer-motion";
+import { IAreaRendererProps } from "@bmunozg/react-image-area";
 
 type props = {
   handleDelete(): void;
-  info: object;
+  info: IAreaRendererProps;
   downloadSelection(): void;
 };
 
@@ -33,6 +34,21 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
         />
       </button>
       <button className="btn-icon" onClick={downloadSelection}>
+        <img
+          title="Download"
+          className="icon"
+          src={CustomIcons.Download}
+          alt="Download"
+        />
+      </button>
+      <button
+        className="btn-icon"
+        onClick={() => {
+          alert(
+            info.x + "\n" + info.y + "\n" + info.height + "\n" + info.width
+          );
+        }}
+      >
         <img
           title="Download"
           className="icon"

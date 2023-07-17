@@ -122,17 +122,19 @@ export default function ReactAreaSelector({
       exit={{ opacity: 0 }}
       id="react-area-selector"
     >
-      <AreaSelector
-        areas={areas}
-        globalAreaStyle={{
-          border: "3.5px dashed gray",
-          backgroundColor: "rgba(173, 216, 230, 0.4)",
-        }}
-        onChange={handleOnChange}
-        customAreaRenderer={customRender}
-      >
-        {image && <img id="selected-image" src={image} alt="my image" />}
-      </AreaSelector>
+      <div id="canvas">
+        <AreaSelector
+          areas={areas}
+          globalAreaStyle={{
+            border: "3.5px dashed gray",
+            backgroundColor: "rgba(173, 216, 230, 0.4)",
+          }}
+          onChange={handleOnChange}
+          customAreaRenderer={customRender}
+        >
+          {image && <img id="selected-image" src={image} alt="my image" />}
+        </AreaSelector>
+      </div>
     </motion.div>
   );
 }
