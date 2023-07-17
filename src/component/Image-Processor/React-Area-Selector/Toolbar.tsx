@@ -39,15 +39,15 @@ const Toolbar = ({
           title="Reset Selection"
           className="icon"
           src={CustomIcons.Reset}
-          alt="Analyze"
+          alt="Reset"
         />
       </button>
       <button className="btn-icon" onClick={() => handleRotate(90)}>
         <img
-          title="Rotate 90"
+          title="Rotate Right"
           className="icon"
           src={CustomIcons.RotateRight}
-          alt="Analyze"
+          alt="Rotate-Right"
         />
       </button>
     </div>

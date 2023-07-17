@@ -305,21 +305,23 @@ const ImageProcessor = () => {
       >
         <ImgUploadBtn handleChange={handleImageChange} />
         {selectedImage && (
-          <ReactAreaSelector
-            image={scaledImage}
-            downloadSelection={processSelectionCrop}
-            areas={areas}
-            setAreas={handleSetAreas}
-          />
+          <>
+            <ReactAreaSelector
+              image={scaledImage}
+              downloadSelection={processSelectionCrop}
+              areas={areas}
+              setAreas={handleSetAreas}
+            />
+            <Toolbar
+              scaleRatio={scaleRatio}
+              setScaleRatio={setScaleRatio}
+              handleScaleRatioUpdate={handleScaleRatioUpdate}
+              handleScaleRatioReset={handleScaledRatioReset}
+              handleResetSelection={handleResetSelection}
+              handleRotate={handleRotate}
+            />
+          </>
         )}
-        <Toolbar
-          scaleRatio={scaleRatio}
-          setScaleRatio={setScaleRatio}
-          handleScaleRatioUpdate={handleScaleRatioUpdate}
-          handleScaleRatioReset={handleScaledRatioReset}
-          handleResetSelection={handleResetSelection}
-          handleRotate={handleRotate}
-        />
       </motion.div>
     </>
   );

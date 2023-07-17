@@ -41,7 +41,7 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
           alt="Download"
         />
       </button>
-      <button
+      {/* <button
         className="btn-icon"
         onClick={() => {
           alert(
@@ -55,7 +55,7 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
           src={CustomIcons.Download}
           alt="Download"
         />
-      </button>
+      </button> */}
     </motion.div>
   );
 };
