@@ -57,7 +57,11 @@ const Toolbar = ({
           alt="Rotate-Right"
         />
       </button>
-      <button className="btn-icon" onClick={handleClearCanvas}>
+      <button
+        id="rmImg"
+        className="btn-icon hoverRed"
+        onClick={handleClearCanvas}
+      >
         <img
           title="Remove Image"
           className="icon"

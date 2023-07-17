@@ -25,7 +25,7 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
           alt="Analyze"
         />
       </button>
-      <button className="btn-icon" onClick={handleDelete}>
+      <button className="btn-icon hoverRed" onClick={handleDelete}>
         <img
           title="Delete"
           className="icon"
