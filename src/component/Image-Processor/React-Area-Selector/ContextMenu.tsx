@@ -32,7 +32,6 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
           alt="Delete"
         />
       </button>
-      {/* <button title = '' className="btn-icon" onClick={() => console.log(info)}> */}
       <button className="btn-icon" onClick={downloadSelection}>
         <img
           title="Download"

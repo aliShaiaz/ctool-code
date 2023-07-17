@@ -1,9 +1,11 @@
-import { EventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ImgUploadBtn from "./ImgUploadBtn";
 
 import "../../css/ImageProcessor.css";
 import ReactAreaSelector from "./React-Area-Selector/_ReactAreaSelector";
-import { motion } from "framer-motion";
+import { PresenceContext, motion } from "framer-motion";
+import { IArea } from "@bmunozg/react-image-area";
+import Toolbar from "./React-Area-Selector/Toolbar";
 
 const ImageProcessor = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(
@@ -11,9 +13,99 @@ const ImageProcessor = () => {
   );
   const [scaledImage, setScaledImage] = useState<string | undefined>(undefined);
   const [scaleRatio, setScaleRatio] = useState<number>(1);
+  const [areas, setAreas] = useState<IArea[]>([]);
+  const [scaledAreas, setScaledAreas] = useState<IArea[]>([]);
+
+  // R & D Zone //
+  async function rotateImage(
+    imageUrl: string,
+    degrees: number
+  ): Promise<string | undefined> {
+    try {
+      const image = new Image();
+
+      // Create a promise to resolve when the image has loaded
+      const imageLoaded = new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = (error) => reject(error);
+      });
+
+      // Set the source of the image to the selected image URL
+      image.src = imageUrl;
+
+      // Wait for the image to load
+      await imageLoaded;
+
+      // Create a canvas element
+      const canvas = document.createElement("canvas");
+
+      // Calculate the new dimensions after rotation
+      const { width, height } = getRotatedImageDimensions(image, degrees);
+
+      // Set the canvas dimensions
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw the rotated image on the canvas
+      const context = canvas.getContext("2d");
+
+      if (context) {
+        context.translate(canvas.width / 2, canvas.height / 2);
+        context.rotate((degrees * Math.PI) / 180);
+        context.drawImage(image, -image.width / 2, -image.height / 2);
+        context.setTransform(1, 0, 0, 1, 0, 0); // Reset the transform
+      } else {
+        throw new Error("Unable to get 2D context from canvas.");
+      }
+
+      // Return the rotated image as a data URL
+      return canvas.toDataURL();
+    } catch (error) {
+      console.error("Error rotating image:", error);
+      return undefined;
+    }
+  }
+
+  function getRotatedImageDimensions(
+    image: HTMLImageElement,
+    degrees: number
+  ): { width: number; height: number } {
+    const radians = (degrees * Math.PI) / 180;
+    const sin = Math.abs(Math.sin(radians));
+    const cos = Math.abs(Math.cos(radians));
+    const newWidth = image.width * cos + image.height * sin;
+    const newHeight = image.width * sin + image.height * cos;
+    return { width: newWidth, height: newHeight };
+  }
+
+  async function handleRotate(degrees: number) {
+    try {
+      if (selectedImage) {
+        const rotatedSelectedImage = await rotateImage(selectedImage, degrees);
+        setSelectedImage(rotatedSelectedImage);
+      }
+
+      if (scaledImage) {
+        const rotatedScaledImage = await rotateImage(scaledImage, degrees);
+        setScaledImage(rotatedScaledImage);
+      }
+    } catch (error) {
+      console.error("Error rotating images:", error);
+    }
+  }
+
+  function handleResetSelection(): void {
+    setScaledAreas([]);
+  }
+
+  // . . . //
 
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    // Default Actions on Image Load
     setScaleRatio(1);
+    setAreas([]);
+    // . . . //
+
     const file = event.target.files?.[0];
 
     if (file) {
@@ -69,95 +161,45 @@ const ImageProcessor = () => {
     // Return the scaled image as a canvas element
     return canvas;
   }
-  async function processImageRatio() {
-    try {
-      const scale = scaleRatio; // Specify the desired scale factor
 
-      // Call the scaleImage function with the selected image URL
-      const scaledImage = await scaleImage(selectedImage!, scale);
-
-      // Update the state with the scaled image
-      setScaledImage(scaledImage.toDataURL()); // Assuming you want to store the scaled image as a data URL
-    } catch (error) {
-      console.error("Error scaling image:", error);
-    }
+  async function scaleSelections(
+    Selections: IArea[],
+    scale: number
+  ): Promise<IArea[]> {
+    Selections.forEach((selection) => {
+      // selection.width = selection.width * scale;
+      // selection.x *= scale;
+      // selection.y *= scale;
+      selection.width *= scale;
+      selection.height *= scale;
+    });
+    return Selections;
   }
 
-  // async function cropImage(
-  //   selectedImage: string,
-  //   x: number,
-  //   y: number,
-  //   width: number,
-  //   height: number
-  // ): Promise<HTMLCanvasElement> {
-  //   // Create a new image element
-  //   const image = new Image();
+  async function handleSetAreas(newAreas: IArea[]): Promise<void> {
+    // setAreas(newAreas);
+    setScaledAreas(newAreas);
+    setAreas(await scaleSelections(newAreas, scaleRatio));
+  }
 
-  //   // Create a promise to resolve when the image has loaded
-  //   const imageLoaded = new Promise<void>((resolve, reject) => {
-  //     image.onload = () => resolve();
-  //     image.onerror = (error) => reject(error);
-  //   });
-
-  //   // Set the source of the image to the selected image URL
-  //   image.src = selectedImage;
-
-  //   // Wait for the image to load
-  //   await imageLoaded;
-
-  //   // Create a canvas element
-  //   const canvas = document.createElement("canvas");
-
-  //   // Set the canvas dimensions to the cropped size
-  //   canvas.width = width;
-  //   canvas.height = height;
-
-  //   // Draw the cropped image on the canvas
-  //   const context = canvas.getContext("2d");
-  //   if (context) {
-  //     context.drawImage(image, x, y, width, height, 0, 0, width, height);
-  //   } else {
-  //     throw new Error("Unable to get 2D context from canvas.");
-  //   }
-
-  //   // Return the cropped image as a canvas element
-  //   return canvas;
-  // }
-
-  function downloadCroppedImage(
-    selectedImage: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ): Promise<Blob> {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
-
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-
-        const context = canvas.getContext("2d");
-        if (context) {
-          context.drawImage(image, x, y, width, height, 0, 0, width, height);
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error("Unable to create Blob."));
-            }
-          });
-        } else {
-          reject(new Error("Unable to get 2D context from canvas."));
-        }
-      };
-
-      image.onerror = (error) => reject(error);
-
-      image.src = selectedImage;
-    });
+  async function processImageRatio() {
+    if(selectedImage){
+      try {
+        const scale = scaleRatio; // Specify the desired scale factor
+  
+        // Call the scaleImage function with the selected image URL
+        const scaledImage = await scaleImage(selectedImage!, scale);
+  
+        // Call the scaleSelection function with all selections 'areas' and the ratio
+        // const newScaledAreas: IArea[] = await scaleSelections(areas, scale);
+  
+        // Update the state with the scaled image
+        setScaledImage(scaledImage.toDataURL()); // Assuming you want to store the scaled image as a data URL
+        // setScaledAreas(newScaledAreas);
+      } catch (error) {
+        console.error("Error scaling image:", error);
+      }
+    }
   }
 
   async function processSelectionCrop(
@@ -199,13 +241,53 @@ const ImageProcessor = () => {
     }
   }
 
+  function downloadCroppedImage(
+    selectedImage: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext("2d");
+        if (context) {
+          context.drawImage(image, x, y, width, height, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error("Unable to create Blob."));
+            }
+          });
+        } else {
+          reject(new Error("Unable to get 2D context from canvas."));
+        }
+      };
+
+      image.onerror = (error) => reject(error);
+
+      image.src = selectedImage;
+    });
+  }
+
+  function handleScaleRatioUpdate(newRatio: number) {
+    setScaleRatio(newRatio);
+  }
+  function handleScaledRatioReset(): void {
+    setScaleRatio(1);
+  }
+
   // Call the function when the selected image changes
   useEffect(() => {
-    if (selectedImage) {
-      processImageRatio();
-      // processSelectionCrop();
-    }
-  }, [selectedImage]);
+    processImageRatio();
+  }, [selectedImage, scaleRatio]);
 
   return (
     <>
@@ -220,18 +302,17 @@ const ImageProcessor = () => {
           <ReactAreaSelector
             image={scaledImage}
             downloadSelection={processSelectionCrop}
+            areas={areas}
+            setAreas={setAreas}
           />
         )}
-        <input
-          type="range"
-          id="ratioSlider"
-          min="1"
-          max="75"
-          value={scaleRatio * 25}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setScaleRatio(parseInt(e.target.value) / 25);
-            processImageRatio();
-          }}
+        <Toolbar
+          scaleRatio={scaleRatio}
+          setScaleRatio={setScaleRatio}
+          handleScaleRatioUpdate={handleScaleRatioUpdate}
+          handleScaleRatioReset={handleScaledRatioReset}
+          handleResetSelection={handleResetSelection}
+          handleRotate={handleRotate}
         />
       </motion.div>
     </>

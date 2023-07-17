@@ -3,4 +3,6 @@ export const CustomIcons = {
   Delete: require("./DeleteIcon.png"),
   View: require("./ViewIcon.png"),
   Download: require("./DownloadIcon.png"),
+  Reset: require("./ResetIcon.png"),
+  RotateRight: require("./RotateRightIcon.png"),
 };

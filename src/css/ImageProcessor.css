@@ -17,13 +17,3 @@
   /* background-color: red; */
   overflow: auto;
 }
-
-#ratioSlider {
-  box-shadow: var(--shadow-2);
-  /* transform: rotate(-0.25turn); */
-  /* background-color: red; */
-  position: fixed;
-  right: 20px;
-  top: 20px;
-  border-radius: 25px;
-}
