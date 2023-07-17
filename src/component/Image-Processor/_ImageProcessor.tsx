@@ -111,8 +111,7 @@ const ImageProcessor = () => {
 
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>): void {
     // Default Actions on Image Load
-    setScaleRatio(1);
-    setAreas([]);
+    handleClearCanvas();
     // . . . //
 
     const file = event.target.files?.[0];
