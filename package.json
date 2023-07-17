@@ -1,6 +1,7 @@
 {
   "name": "react-ts-image-crop",
   "version": "0.1.0",
+  "homepage": "https://alishaiaz.github.io/ctool/",
   "private": true,
   "dependencies": {
     "@bmunozg/react-image-area": "^1.1.0",
@@ -12,6 +13,7 @@
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "framer-motion": "^10.12.22",
+    "gh-pages": "^5.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -19,6 +21,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
