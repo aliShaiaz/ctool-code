@@ -1,5 +1,19 @@
 #img-upload-btn {
   position: fixed;
+
+  /* Styles 2 */
+  /* top: 20px;
+  left: 20px; */
+  /*  */
+
+  /* Styles */
+  /* width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center; */
+  /*  */
+
 }
 
 .imgUpload {
@@ -11,11 +25,12 @@
   z-index: -1;
 }
 .imgUpload + label {
+  /* position: absolute; */
+  /* margin: auto; */
   height: 75px;
   width: 170px;
-  top: 20px;
-  left: 20px;
-  position: absolute;
+  /* top: 20px; */
+  /* left: 20px; */
   z-index: 1;
   border-radius: 20px;
   display: flex;

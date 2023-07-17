@@ -9,6 +9,7 @@ type props = {
   handleResetSelection(): void;
   handleRotate(degree: number): void;
   handleScaleRatioReset(): void;
+  handleClearCanvas(): void;
 };
 const Toolbar = ({
   scaleRatio,
@@ -17,6 +18,7 @@ const Toolbar = ({
   handleResetSelection,
   handleRotate,
   handleScaleRatioReset,
+  handleClearCanvas,
 }: props) => {
   return (
     <div id="toolbar">
@@ -48,6 +50,14 @@ const Toolbar = ({
           className="icon"
           src={CustomIcons.RotateRight}
           alt="Rotate-Right"
+        />
+      </button>
+      <button className="btn-icon" onClick={handleClearCanvas}>
+        <img
+          title="Remove Image"
+          className="icon"
+          src={CustomIcons.Delete}
+          alt="Remove Image"
         />
       </button>
     </div>

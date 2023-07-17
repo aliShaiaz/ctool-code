@@ -17,6 +17,14 @@ const ImageProcessor = () => {
   const [areasBackup, setAreasBackup] = useState<IArea[]>([]);
 
   // R & D Zone //
+
+  function handleClearCanvas(): void {
+    setScaledImage(undefined);
+    setSelectedImage(undefined);
+    setScaleRatio(1);
+    setAreas([]);
+  }
+
   async function rotateImage(
     imageUrl: string,
     degrees: number
@@ -303,9 +311,12 @@ const ImageProcessor = () => {
         exit={{ opacity: 0 }}
         id="image-processor"
       >
-        <ImgUploadBtn handleChange={handleImageChange} />
+        {!selectedImage && (
+          <ImgUploadBtn handleChange={handleImageChange} trigger={true} />
+        )}
         {selectedImage && (
           <>
+            <ImgUploadBtn handleChange={handleImageChange} trigger={false} />
             <ReactAreaSelector
               image={scaledImage}
               downloadSelection={processSelectionCrop}
@@ -319,6 +330,7 @@ const ImageProcessor = () => {
               handleScaleRatioReset={handleScaledRatioReset}
               handleResetSelection={handleResetSelection}
               handleRotate={handleRotate}
+              handleClearCanvas={handleClearCanvas}
             />
           </>
         )}
