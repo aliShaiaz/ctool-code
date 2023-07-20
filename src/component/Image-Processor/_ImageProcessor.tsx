@@ -3,14 +3,12 @@ import ImgUploadBtn from "./ImgUploadBtn";
 
 import "../../css/ImageProcessor.css";
 import ReactAreaSelector from "./React-Area-Selector/_ReactAreaSelector";
-import { PresenceContext, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { IArea } from "@bmunozg/react-image-area";
 import Toolbar from "./React-Area-Selector/Toolbar";
 
 const ImageProcessor = () => {
-  const [selectedImage, setSelectedImage] = useState<string | undefined>(
-    undefined
-  );
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
   const [scaledImage, setScaledImage] = useState<string | undefined>(undefined);
   const [scaleRatio, setScaleRatio] = useState<number>(1);
   const [areas, setAreas] = useState<IArea[]>([]);
@@ -26,10 +24,7 @@ const ImageProcessor = () => {
     setAreasBackup([]);
   }
 
-  async function rotateImage(
-    imageUrl: string,
-    degrees: number
-  ): Promise<string | undefined> {
+  async function rotateImage(imageUrl: string, degrees: number): Promise<string | undefined> {
     try {
       const image = new Image();
 
@@ -127,10 +122,7 @@ const ImageProcessor = () => {
     }
   }
 
-  async function scaleImage(
-    selectedImage: string,
-    scale: number
-  ): Promise<HTMLCanvasElement> {
+  async function scaleImage(selectedImage: string, scale: number): Promise<HTMLCanvasElement> {
     // Create a new image element
     const image = new Image();
 
@@ -170,10 +162,7 @@ const ImageProcessor = () => {
     return canvas;
   }
 
-  async function scaleSelections(
-    selections: IArea[],
-    scale: number
-  ): Promise<IArea[]> {
+  async function scaleSelections(selections: IArea[], scale: number): Promise<IArea[]> {
     return selections.map((selection) => {
       return {
         ...selection,
@@ -202,10 +191,7 @@ const ImageProcessor = () => {
         const scaledImage = await scaleImage(selectedImage!, scale);
 
         // Call the scaleSelection function with all selections 'areas' and the ratio
-        const newScaledAreas: IArea[] = await scaleSelections(
-          areasBackup,
-          scale
-        );
+        const newScaledAreas: IArea[] = await scaleSelections(areasBackup, scale);
 
         // Update the state with the scaled image
         setScaledImage(scaledImage.toDataURL()); // Assuming you want to store the scaled image as a data URL
@@ -216,12 +202,7 @@ const ImageProcessor = () => {
     }
   }
 
-  async function processSelectionCrop(
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ) {
+  async function processSelectionCrop(x: number, y: number, width: number, height: number) {
     try {
       // const x = 100; // X-coordinate of the top-left corner of the cropped area
       // const y = 100; // Y-coordinate of the top-left corner of the cropped area
@@ -311,9 +292,7 @@ const ImageProcessor = () => {
         exit={{ opacity: 0, scale: 0 }}
         id="image-processor"
       >
-        {!selectedImage && (
-          <ImgUploadBtn handleChange={handleImageChange} trigger={false} />
-        )}
+        {!selectedImage && <ImgUploadBtn handleChange={handleImageChange} trigger={false} />}
         {selectedImage && (
           <>
             <ImgUploadBtn handleChange={handleImageChange} trigger={true} />
