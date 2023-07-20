@@ -5,7 +5,8 @@ import "../../css/ImageProcessor.css";
 import ReactAreaSelector from "./React-Area-Selector/_ReactAreaSelector";
 import { motion } from "framer-motion";
 import { IArea } from "@bmunozg/react-image-area";
-import Toolbar from "./React-Area-Selector/Toolbar";
+import ToolbarComponent from "../__trash/ToolbarComponent";
+import Toolbar from "./Toolbar";
 
 const ImageProcessor = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
@@ -14,15 +15,95 @@ const ImageProcessor = () => {
   const [areas, setAreas] = useState<IArea[]>([]);
   const [areasBackup, setAreasBackup] = useState<IArea[]>([]);
 
-  // R & D Zone //
+  function view_scaleRatio(): number {
+    return scaleRatio;
+  }
+  function update_scaleRatio(newRatio: number): void {
+    setScaleRatio(newRatio);
+  }
 
-  function handleClearCanvas(): void {
+  async function rotate(degrees: number) {
+    try {
+      const promises: Promise<string | undefined>[] = [];
+
+      if (selectedImage) {
+        promises.push(rotateImage(selectedImage, degrees));
+      }
+      if (scaledImage) {
+        promises.push(rotateImage(scaledImage, degrees));
+      }
+
+      const [rotatedSelectedImage, rotatedScaledImage] = await Promise.all(promises);
+
+      // Handle rotatedSelectedImage and rotatedScaledImage updates
+      if (rotatedSelectedImage) {
+        setSelectedImage(rotatedSelectedImage);
+      }
+      if (rotatedScaledImage) {
+        setScaledImage(rotatedScaledImage);
+      }
+    } catch (error) {
+      console.error("Error rotating:", error);
+    }
+  }
+
+  function clearSelection(): void {
+    setAreas([]);
+  }
+  function clearCanvas(): void {
     setScaledImage(undefined);
     setSelectedImage(undefined);
     setScaleRatio(1);
     setAreas([]);
     setAreasBackup([]);
   }
+
+  // Image //
+  // async function rotateImage(imageUrl: string, degrees: number): Promise<string | undefined> {
+  //   try {
+  //     const image = new Image();
+
+  //     // Create a promise to resolve when the image has loaded
+  //     const imageLoaded = new Promise<void>((resolve, reject) => {
+  //       image.onload = () => resolve();
+  //       image.onerror = (error) => reject(error);
+  //     });
+
+  //     // Set the source of the image to the selected image URL
+  //     image.src = imageUrl;
+
+  //     // Wait for the image to load
+  //     await imageLoaded;
+
+  //     // Create a canvas element
+  //     const canvas = document.createElement("canvas");
+
+  //     // Calculate the new dimensions after rotation
+  //     const { width, height } = getRotatedImageDimensions(image, degrees);
+
+  //     // Set the canvas dimensions
+  //     canvas.width = width;
+  //     canvas.height = height;
+
+  //     // Draw the rotated image on the canvas
+  //     const context = canvas.getContext("2d");
+
+  //     if (context) {
+  //       context.translate(canvas.width / 2, canvas.height / 2);
+  //       context.rotate((degrees * Math.PI) / 180);
+  //       context.drawImage(image, -image.width / 2, -image.height / 2);
+  //       context.setTransform(1, 0, 0, 1, 0, 0); // Reset the transform
+  //     } else {
+  //       throw new Error("Unable to get 2D context from canvas.");
+  //     }
+
+  //     // Return the rotated image as a data URL
+  //     return canvas.toDataURL();
+  //   } catch (error) {
+  //     console.error("Error rotating image:", error);
+  //     return undefined;
+  //   }
+  // }
 
   async function rotateImage(imageUrl: string, degrees: number): Promise<string | undefined> {
     try {
@@ -82,31 +163,9 @@ const ImageProcessor = () => {
     return { width: newWidth, height: newHeight };
   }
 
-  async function handleRotate(degrees: number) {
-    try {
-      if (selectedImage) {
-        const rotatedSelectedImage = await rotateImage(selectedImage, degrees);
-        setSelectedImage(rotatedSelectedImage);
-      }
-
-      if (scaledImage) {
-        const rotatedScaledImage = await rotateImage(scaledImage, degrees);
-        setScaledImage(rotatedScaledImage);
-      }
-    } catch (error) {
-      console.error("Error rotating images:", error);
-    }
-  }
-
-  function handleResetSelection(): void {
-    setAreas([]);
-  }
-
-  // . . . //
-
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>): void {
     // Default Actions on Image Load
-    handleClearCanvas();
+    clearCanvas();
     // . . . //
 
     const file = event.target.files?.[0];
@@ -121,7 +180,6 @@ const ImageProcessor = () => {
       reader.readAsDataURL(file);
     }
   }
-
   async function scaleImage(selectedImage: string, scale: number): Promise<HTMLCanvasElement> {
     // Create a new image element
     const image = new Image();
@@ -162,26 +220,6 @@ const ImageProcessor = () => {
     return canvas;
   }
 
-  async function scaleSelections(selections: IArea[], scale: number): Promise<IArea[]> {
-    return selections.map((selection) => {
-      return {
-        ...selection,
-        x: selection.x * scale,
-        y: selection.y * scale,
-        width: selection.width * scale,
-        height: selection.height * scale,
-      };
-    });
-  }
-
-  async function handleSetAreas(newAreas: IArea[]): Promise<void> {
-    // setScaledAreas(newAreas);
-    // setAreas(await scaleSelections(newAreas, scaleRatio));
-
-    setAreas(newAreas);
-    setAreasBackup(await scaleSelections(newAreas, scaleRatio));
-  }
-
   async function processImageRatio() {
     if (selectedImage) {
       try {
@@ -200,6 +238,42 @@ const ImageProcessor = () => {
         console.error("Error scaling image:", error);
       }
     }
+  }
+  // . . . //
+
+  // Selection //
+
+  async function scaleSelections(selections: IArea[], scale: number): Promise<IArea[]> {
+    return selections.map((selection) => {
+      return {
+        ...selection,
+        x: selection.x * scale,
+        y: selection.y * scale,
+        width: selection.width * scale,
+        height: selection.height * scale,
+      };
+    });
+  }
+  // . . . //
+
+  // Toolbar Operations //
+  function handleScaleRatioUpdate(newRatio: number) {
+    setScaleRatio(newRatio);
+  }
+  function handleScaledRatioReset(): void {
+    setScaleRatio(1);
+  }
+
+  // . . . //
+
+  // Common //
+
+  async function handleSetAreas(newAreas: IArea[]): Promise<void> {
+    // setScaledAreas(newAreas);
+    // setAreas(await scaleSelections(newAreas, scaleRatio));
+
+    setAreas(newAreas);
+    setAreasBackup(await scaleSelections(newAreas, scaleRatio));
   }
 
   async function processSelectionCrop(x: number, y: number, width: number, height: number) {
@@ -272,14 +346,7 @@ const ImageProcessor = () => {
     });
   }
 
-  function handleScaleRatioUpdate(newRatio: number) {
-    setScaleRatio(newRatio);
-  }
-  function handleScaledRatioReset(): void {
-    setScaleRatio(1);
-  }
-
-  // Call the function when the selected image changes
+  // Call the function when the selectedImage or Ratio changes //
   useEffect(() => {
     processImageRatio();
   }, [selectedImage, scaleRatio]);
@@ -302,14 +369,13 @@ const ImageProcessor = () => {
               areas={areas}
               setAreas={handleSetAreas}
             />
+
             <Toolbar
-              scaleRatio={scaleRatio}
-              setScaleRatio={setScaleRatio}
-              handleScaleRatioUpdate={handleScaleRatioUpdate}
-              handleScaleRatioReset={handleScaledRatioReset}
-              handleResetSelection={handleResetSelection}
-              handleRotate={handleRotate}
-              handleClearCanvas={handleClearCanvas}
+              getRatio={view_scaleRatio}
+              setRatio={update_scaleRatio}
+              rotate={rotate}
+              clearSelection={clearSelection}
+              clearCanvas={clearCanvas}
             />
           </>
         )}
