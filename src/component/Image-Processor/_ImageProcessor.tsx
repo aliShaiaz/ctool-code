@@ -14,6 +14,7 @@ const ImageProcessor = () => {
   const [scaleRatio, setScaleRatio] = useState<number>(1);
   const [areas, setAreas] = useState<IArea[]>([]);
   const [areasBackup, setAreasBackup] = useState<IArea[]>([]);
+  const [degree, setDegree] = useState<number>(0);
 
   function view_scaleRatio(): number {
     return scaleRatio;
@@ -21,29 +22,39 @@ const ImageProcessor = () => {
   function update_scaleRatio(newRatio: number): void {
     setScaleRatio(newRatio);
   }
+  function view_degree(): number {
+    return degree;
+  }
+  function update_degree(newDegree: number): void {
+    setDegree(newDegree);
+  }
 
   async function rotate(degrees: number) {
-    try {
-      const promises: Promise<string | undefined>[] = [];
+    if (selectedImage) {
+      try {
+        if (degrees == 90) {
+          const promises: Promise<string | undefined>[] = [];
 
-      if (selectedImage) {
-        promises.push(rotateImage(selectedImage, degrees));
-      }
-      if (scaledImage) {
-        promises.push(rotateImage(scaledImage, degrees));
-      }
+          promises.push(rotateImage(selectedImage, degrees));
+          if (scaledImage) {
+            promises.push(rotateImage(scaledImage, degrees));
+          }
 
-      const [rotatedSelectedImage, rotatedScaledImage] = await Promise.all(promises);
+          const [rotatedSelectedImage, rotatedScaledImage] = await Promise.all(promises);
 
-      // Handle rotatedSelectedImage and rotatedScaledImage updates
-      if (rotatedSelectedImage) {
-        setSelectedImage(rotatedSelectedImage);
+          // Handle rotatedSelectedImage and rotatedScaledImage updates
+          if (rotatedSelectedImage) {
+            setSelectedImage(rotatedSelectedImage);
+          }
+          if (rotatedScaledImage) {
+            setScaledImage(rotatedScaledImage);
+          }
+        } else {
+          setScaledImage(await rotateImage(selectedImage, degrees));
+        }
+      } catch (error) {
+        console.error("Error rotating:", error);
       }
-      if (rotatedScaledImage) {
-        setScaledImage(rotatedScaledImage);
-      }
-    } catch (error) {
-      console.error("Error rotating:", error);
     }
   }
 
@@ -257,12 +268,6 @@ const ImageProcessor = () => {
   // . . . //
 
   // Toolbar Operations //
-  function handleScaleRatioUpdate(newRatio: number) {
-    setScaleRatio(newRatio);
-  }
-  function handleScaledRatioReset(): void {
-    setScaleRatio(1);
-  }
 
   // . . . //
 
@@ -373,6 +378,8 @@ const ImageProcessor = () => {
             <Toolbar
               getRatio={view_scaleRatio}
               setRatio={update_scaleRatio}
+              getDegree={view_degree}
+              setDegree={update_degree}
               rotate={rotate}
               clearSelection={clearSelection}
               clearCanvas={clearCanvas}

@@ -6,6 +6,8 @@ import "../../css/Toolbar.css";
 interface ToolbarProps {
   getRatio(): number;
   setRatio(newRatio: number): void;
+  getDegree(): number;
+  setDegree(newRatio: number): void;
 
   rotate(degree: number): void;
   clearSelection(): void;
@@ -14,6 +16,7 @@ interface ToolbarProps {
 
 interface ToolbarState {
   ratio: number;
+  degree: number;
 }
 
 class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
@@ -21,6 +24,7 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
     super(props);
     this.state = {
       ratio: props.getRatio(),
+      degree: props.getDegree(),
     };
   }
 
@@ -28,13 +32,23 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
     prevProps: Readonly<ToolbarProps>,
     prevState: Readonly<ToolbarState>,
     snapshot?: any
-  ): void {
-    const { ratio } = this.state;
-    const { ratio: prevRatio } = prevState;
+  ) {
+    const { ratio, degree } = this.state;
+    const { ratio: prevRatio, degree: prevDegree } = prevState;
 
+    // Ratio Monitoring //
     if (ratio != prevRatio) {
       this.props.setRatio(ratio);
     }
+    // . . . //
+
+    // Rotation Monitoring //
+    if (degree != prevDegree) {
+      console.log(degree);
+      this.props.rotate(degree);
+      // this.setState({ degree: 0 });
+    }
+    // . . . //
   }
 
   handleRatioUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +70,14 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
 
   handleClearCanvas = () => {
     this.props.clearCanvas();
+  };
+
+  handleRotationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const degree = parseInt(e.target.value);
+    this.setState({ degree });
+  };
+  handleRotationReset = () => {
+    this.setState({ degree: 0 });
   };
 
   render() {
@@ -92,6 +114,39 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
         <button id="rmImg" className="btn-icon hoverRed" onClick={this.handleClearCanvas}>
           <img title="Remove Image" className="icon" src={CustomIcons.Delete} alt="Remove Image" />
         </button>
+
+        <div>
+          <button
+            className="btn-icon"
+            onClick={() => {
+              const { degree } = this.state;
+              this.setState({ degree: degree + 1 });
+            }}
+          >
+            +
+          </button>
+          <input
+            id="imageRotationDial"
+            type="range"
+            min={-45}
+            max={45}
+            step={1}
+            value={this.state.degree}
+            onChange={this.handleRotationChange}
+          />
+          <button
+            className="btn-icon"
+            onClick={() => {
+              const { degree } = this.state;
+              this.setState({ degree: degree - 1 });
+            }}
+          >
+            -
+          </button>
+        </div>
+        <label htmlFor="imageRotationDial" onClick={this.handleRotationReset}>
+          Reset
+        </label>
       </motion.div>
     );
   }
