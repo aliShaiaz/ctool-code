@@ -283,11 +283,6 @@ const ImageProcessor = () => {
 
   async function processSelectionCrop(x: number, y: number, width: number, height: number) {
     try {
-      // const x = 100; // X-coordinate of the top-left corner of the cropped area
-      // const y = 100; // Y-coordinate of the top-left corner of the cropped area
-      // const width = 200; // Width of the cropped area
-      // const height = 150; // Height of the cropped area
-
       // Call the downloadCroppedImage function with the selected image URL and crop parameters
       const croppedImageBlob = await downloadCroppedImage(
         selectedImage!,
