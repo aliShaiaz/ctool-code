@@ -18,28 +18,13 @@ const ContextMenu = ({ handleDelete, info, downloadSelection }: props) => {
       className="contextMenu"
     >
       <button className="btn-icon">
-        <img
-          title="Analyze"
-          className="icon"
-          src={CustomIcons.Analyze}
-          alt="Analyze"
-        />
+        <img title="Analyze" className="icon" src={CustomIcons.Analyze} alt="Analyze" />
       </button>
       <button className="btn-icon hoverRed" onClick={handleDelete}>
-        <img
-          title="Delete"
-          className="icon"
-          src={CustomIcons.Delete}
-          alt="Delete"
-        />
+        <img title="Delete" className="icon" src={CustomIcons.Delete} alt="Delete" />
       </button>
       <button className="btn-icon" onClick={downloadSelection}>
-        <img
-          title="Download"
-          className="icon"
-          src={CustomIcons.Download}
-          alt="Download"
-        />
+        <img title="Download" className="icon" src={CustomIcons.Download} alt="Download" />
       </button>
       {/* <button
         className="btn-icon"

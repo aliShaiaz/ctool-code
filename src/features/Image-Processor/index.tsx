@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import ImgUploadBtn from "./ImgUploadBtn";
+import ImgUploadBtn from "./components/ImgUploadBtn";
 
 import "../../css/ImageProcessor.css";
-import ReactAreaSelector from "./React-Area-Selector/_ReactAreaSelector";
+import ReactAreaSelector from "./components/ReactAreaSelector";
 import { motion } from "framer-motion";
 import { IArea } from "@bmunozg/react-image-area";
-import ToolbarComponent from "../__trash/ToolbarComponent";
-import Toolbar from "./Toolbar";
+import Toolbar from "./components/Toolbar";
 
 const ImageProcessor = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);

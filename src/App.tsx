@@ -1,4 +1,4 @@
-import ImageProcessor from "./component/Image-Processor/_ImageProcessor";
+import ImageProcessor from "./features/Image-Processor";
 import "./css/App.css";
 
 function App() {

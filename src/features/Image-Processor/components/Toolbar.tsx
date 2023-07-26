@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import React from "react";
-import { CustomIcons } from "../../icons/_index";
+import { CustomIcons } from "../../../icons/_index";
 import "../../css/Toolbar.css";
 
 interface ToolbarProps {
