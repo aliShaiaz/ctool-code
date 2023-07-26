@@ -203,9 +203,6 @@ const ImageProcessor = () => {
       }
     }
   }
-  // . . . //
-
-  // Selection //
 
   async function scaleSelections(selections: IArea[], scale: number): Promise<IArea[]> {
     return selections.map((selection) => {
@@ -218,51 +215,37 @@ const ImageProcessor = () => {
       };
     });
   }
-  // . . . //
-
-  // Toolbar Operations //
-
-  // . . . //
-
-  // Common //
 
   async function handleSetAreas(newAreas: IArea[]): Promise<void> {
-    // setScaledAreas(newAreas);
-    // setAreas(await scaleSelections(newAreas, scaleRatio));
-
     setAreas(newAreas);
     setAreasBackup(await scaleSelections(newAreas, scaleRatio));
   }
 
   async function processSelectionCrop(x: number, y: number, width: number, height: number) {
-    // if (selectedImage)
     try {
       // Call the downloadCroppedImage function with the selected image URL and crop parameters
-
       const newImage: string | undefined = await rotateImage(scaledImage!, degree);
-      {
-        const croppedImageBlob = await downloadCroppedImage(
-          newImage!,
-          x / scaleRatio,
-          y / scaleRatio,
-          width / scaleRatio,
-          height / scaleRatio
-        );
+      const croppedImageBlob = await downloadCroppedImage(
+        newImage!,
+        x / scaleRatio,
+        y / scaleRatio,
+        width / scaleRatio,
+        height / scaleRatio
+      );
 
-        // Create a download link element
-        const downloadLink = document.createElement("a");
-        downloadLink.href = URL.createObjectURL(croppedImageBlob);
-        downloadLink.download = "cropped_image.png";
+      // Create a download link element
+      const downloadLink = document.createElement("a");
+      downloadLink.href = URL.createObjectURL(croppedImageBlob);
+      downloadLink.download = "cropped_image.png";
 
-        // Programmatically click the download link
-        downloadLink.click();
+      // Programmatically click the download link
+      downloadLink.click();
 
-        // Clean up the object URL after the download has started
-        URL.revokeObjectURL(downloadLink.href);
+      // Clean up the object URL after the download has started
+      URL.revokeObjectURL(downloadLink.href);
 
-        // Update the state with the cropped image
-        // setScaledImage(croppedImage.toDataURL()); // Assuming you want to store the cropped image as a data URL
-      }
+      // Update the state with the cropped image
+      // setScaledImage(croppedImage.toDataURL()); // Assuming you want to store the cropped image as a data URL
     } catch (error) {
       console.error("Error cropping image:", error);
     }
