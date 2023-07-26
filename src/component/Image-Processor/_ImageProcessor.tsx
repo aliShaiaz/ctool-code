@@ -69,53 +69,6 @@ const ImageProcessor = () => {
     setAreasBackup([]);
   }
 
-  // Image //
-  // async function rotateImage(imageUrl: string, degrees: number): Promise<string | undefined> {
-  //   try {
-  //     const image = new Image();
-
-  //     // Create a promise to resolve when the image has loaded
-  //     const imageLoaded = new Promise<void>((resolve, reject) => {
-  //       image.onload = () => resolve();
-  //       image.onerror = (error) => reject(error);
-  //     });
-
-  //     // Set the source of the image to the selected image URL
-  //     image.src = imageUrl;
-
-  //     // Wait for the image to load
-  //     await imageLoaded;
-
-  //     // Create a canvas element
-  //     const canvas = document.createElement("canvas");
-
-  //     // Calculate the new dimensions after rotation
-  //     const { width, height } = getRotatedImageDimensions(image, degrees);
-
-  //     // Set the canvas dimensions
-  //     canvas.width = width;
-  //     canvas.height = height;
-
-  //     // Draw the rotated image on the canvas
-  //     const context = canvas.getContext("2d");
-
-  //     if (context) {
-  //       context.translate(canvas.width / 2, canvas.height / 2);
-  //       context.rotate((degrees * Math.PI) / 180);
-  //       context.drawImage(image, -image.width / 2, -image.height / 2);
-  //       context.setTransform(1, 0, 0, 1, 0, 0); // Reset the transform
-  //     } else {
-  //       throw new Error("Unable to get 2D context from canvas.");
-  //     }
-
-  //     // Return the rotated image as a data URL
-  //     return canvas.toDataURL();
-  //   } catch (error) {
-  //     console.error("Error rotating image:", error);
-  //     return undefined;
-  //   }
-  // }
-
   async function rotateImage(imageUrl: string, degrees: number): Promise<string | undefined> {
     try {
       const image = new Image();
@@ -282,29 +235,34 @@ const ImageProcessor = () => {
   }
 
   async function processSelectionCrop(x: number, y: number, width: number, height: number) {
+    // if (selectedImage)
     try {
       // Call the downloadCroppedImage function with the selected image URL and crop parameters
-      const croppedImageBlob = await downloadCroppedImage(
-        selectedImage!,
-        x / scaleRatio,
-        y / scaleRatio,
-        width / scaleRatio,
-        height / scaleRatio
-      );
 
-      // Create a download link element
-      const downloadLink = document.createElement("a");
-      downloadLink.href = URL.createObjectURL(croppedImageBlob);
-      downloadLink.download = "cropped_image.png";
+      const newImage: string | undefined = await rotateImage(scaledImage!, degree);
+      {
+        const croppedImageBlob = await downloadCroppedImage(
+          newImage!,
+          x / scaleRatio,
+          y / scaleRatio,
+          width / scaleRatio,
+          height / scaleRatio
+        );
 
-      // Programmatically click the download link
-      downloadLink.click();
+        // Create a download link element
+        const downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(croppedImageBlob);
+        downloadLink.download = "cropped_image.png";
 
-      // Clean up the object URL after the download has started
-      URL.revokeObjectURL(downloadLink.href);
+        // Programmatically click the download link
+        downloadLink.click();
 
-      // Update the state with the cropped image
-      // setScaledImage(croppedImage.toDataURL()); // Assuming you want to store the cropped image as a data URL
+        // Clean up the object URL after the download has started
+        URL.revokeObjectURL(downloadLink.href);
+
+        // Update the state with the cropped image
+        // setScaledImage(croppedImage.toDataURL()); // Assuming you want to store the cropped image as a data URL
+      }
     } catch (error) {
       console.error("Error cropping image:", error);
     }
