@@ -300,8 +300,9 @@ const ImageProcessor = () => {
         exit={{ opacity: 0, scale: 0 }}
         id="image-processor"
       >
-        {!selectedImage && <ImgUploadBtn handleChange={handleImageChange} trigger={false} />}
-        {selectedImage && (
+        {!selectedImage ? (
+          <ImgUploadBtn handleChange={handleImageChange} trigger={false} />
+        ) : (
           <>
             <ImgUploadBtn handleChange={handleImageChange} trigger={true} />
             <ReactAreaSelector
