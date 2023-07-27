@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import ImgUploadBtn from "./components/ImgUploadBtn";
 
-import "../../css/ImageProcessor.css";
 import ReactAreaSelector from "./components/ReactAreaSelector";
 import { motion } from "framer-motion";
 import { IArea } from "@bmunozg/react-image-area";
 import Toolbar from "./components/Toolbar";
+import ImageUtils from "./utils/ImageUtils";
+
+import "./styles/ImageProcessor.css";
 
 const ImageProcessor = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
@@ -14,6 +16,8 @@ const ImageProcessor = () => {
   const [areas, setAreas] = useState<IArea[]>([]);
   const [areasBackup, setAreasBackup] = useState<IArea[]>([]);
   const [degree, setDegree] = useState<number>(0);
+
+  const imageUtil = new ImageUtils();
 
   function view_scaleRatio(): number {
     return scaleRatio;
@@ -34,9 +38,9 @@ const ImageProcessor = () => {
         if (degrees == 90) {
           const promises: Promise<string | undefined>[] = [];
 
-          promises.push(rotateImage(selectedImage, degrees));
+          promises.push(imageUtil.rotateImage(selectedImage, degrees));
           if (scaledImage) {
-            promises.push(rotateImage(scaledImage, degrees));
+            promises.push(imageUtil.rotateImage(scaledImage, degrees));
           }
 
           const [rotatedSelectedImage, rotatedScaledImage] = await Promise.all(promises);
@@ -49,7 +53,7 @@ const ImageProcessor = () => {
             setScaledImage(rotatedScaledImage);
           }
         } else {
-          setScaledImage(await rotateImage(selectedImage, degrees));
+          setScaledImage(await imageUtil.rotateImage(selectedImage, degrees));
         }
       } catch (error) {
         console.error("Error rotating:", error);
@@ -66,64 +70,6 @@ const ImageProcessor = () => {
     setScaleRatio(1);
     setAreas([]);
     setAreasBackup([]);
-  }
-
-  async function rotateImage(imageUrl: string, degrees: number): Promise<string | undefined> {
-    try {
-      const image = new Image();
-
-      // Create a promise to resolve when the image has loaded
-      const imageLoaded = new Promise<void>((resolve, reject) => {
-        image.onload = () => resolve();
-        image.onerror = (error) => reject(error);
-      });
-
-      // Set the source of the image to the selected image URL
-      image.src = imageUrl;
-
-      // Wait for the image to load
-      await imageLoaded;
-
-      // Create a canvas element
-      const canvas = document.createElement("canvas");
-
-      // Calculate the new dimensions after rotation
-      const { width, height } = getRotatedImageDimensions(image, degrees);
-
-      // Set the canvas dimensions
-      canvas.width = width;
-      canvas.height = height;
-
-      // Draw the rotated image on the canvas
-      const context = canvas.getContext("2d");
-
-      if (context) {
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.rotate((degrees * Math.PI) / 180);
-        context.drawImage(image, -image.width / 2, -image.height / 2);
-        context.setTransform(1, 0, 0, 1, 0, 0); // Reset the transform
-      } else {
-        throw new Error("Unable to get 2D context from canvas.");
-      }
-
-      // Return the rotated image as a data URL
-      return canvas.toDataURL();
-    } catch (error) {
-      console.error("Error rotating image:", error);
-      return undefined;
-    }
-  }
-
-  function getRotatedImageDimensions(
-    image: HTMLImageElement,
-    degrees: number
-  ): { width: number; height: number } {
-    const radians = (degrees * Math.PI) / 180;
-    const sin = Math.abs(Math.sin(radians));
-    const cos = Math.abs(Math.cos(radians));
-    const newWidth = image.width * cos + image.height * sin;
-    const newHeight = image.width * sin + image.height * cos;
-    return { width: newWidth, height: newHeight };
   }
 
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -223,7 +169,7 @@ const ImageProcessor = () => {
   async function processSelectionCrop(x: number, y: number, width: number, height: number) {
     try {
       // Call the downloadCroppedImage function with the selected image URL and crop parameters
-      const newImage: string | undefined = await rotateImage(scaledImage!, degree);
+      const newImage: string | undefined = scaledImage && (await imageUtil.rotateImage(scaledImage, degree));
       const croppedImageBlob = await downloadCroppedImage(
         newImage!,
         x / scaleRatio,

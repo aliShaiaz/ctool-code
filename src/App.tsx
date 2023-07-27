@@ -1,5 +1,5 @@
 import ImageProcessor from "./features/Image-Processor";
-import "./css/App.css";
+import "./styles/App.css";
 
 function App() {
   return (

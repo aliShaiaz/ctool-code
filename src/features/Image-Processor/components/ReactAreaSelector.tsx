@@ -5,7 +5,7 @@ import {
 } from "@bmunozg/react-image-area";
 import { useCallback, useEffect, useState } from "react";
 import ContextMenu from "./ContextMenu";
-import "../../../css/ReactAreaSelector.css";
+import "../styles/ReactAreaSelector.css";
 import { motion } from "framer-motion";
 
 type props = {

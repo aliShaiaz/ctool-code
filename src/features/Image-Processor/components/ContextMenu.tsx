@@ -1,5 +1,5 @@
 import { CustomIcons } from "../../../icons/_index";
-import "../../../css/ContextMenu.css";
+import "../styles/ContextMenu.css";
 import { motion } from "framer-motion";
 import { IAreaRendererProps } from "@bmunozg/react-image-area";
 

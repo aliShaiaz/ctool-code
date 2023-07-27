@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import "../../css/ImgUploadBtn.css";
+import "../styles/ImgUploadBtn.css";
 
 type props = {
   handleChange(event: React.ChangeEvent<HTMLInputElement>): void;
