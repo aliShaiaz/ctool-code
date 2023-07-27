@@ -8,6 +8,7 @@ import Toolbar from "./components/Toolbar";
 import ImageUtils from "./utils/ImageUtils";
 
 import "./styles/ImageProcessor.css";
+import SelectionsUtils from "./utils/SelectionsUtils";
 
 const ImageProcessor = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
@@ -18,6 +19,7 @@ const ImageProcessor = () => {
   const [degree, setDegree] = useState<number>(0);
 
   const imageUtil = new ImageUtils();
+  const selectionUtil = new SelectionsUtils();
 
   function view_scaleRatio(): number {
     return scaleRatio;
@@ -37,9 +39,9 @@ const ImageProcessor = () => {
       try {
         const promises: Promise<string | undefined>[] = [];
 
-        promises.push(imageUtil.rotateImage(selectedImage, 90));
+        promises.push(imageUtil.rotate(selectedImage, 90));
         if (scaledImage) {
-          promises.push(imageUtil.rotateImage(scaledImage, 90));
+          promises.push(imageUtil.rotate(scaledImage, 90));
         }
 
         const [rotatedSelectedImage, rotatedScaledImage] = await Promise.all(promises);
@@ -59,7 +61,7 @@ const ImageProcessor = () => {
   async function rotate(degrees: number) {
     if (selectedImage) {
       try {
-        setScaledImage(await imageUtil.rotateImage(selectedImage, degrees));
+        setScaledImage(await imageUtil.rotate(selectedImage, degrees));
       } catch (error) {
         console.error("Error rotating:", error);
       }
@@ -96,58 +98,22 @@ const ImageProcessor = () => {
   }
 
   // To Optimize // // // // // // // // //
-  async function scaleImage(selectedImage: string, scale: number): Promise<HTMLCanvasElement> {
-    // Create a new image element
-    const image = new Image();
 
-    // Create a promise to resolve when the image has loaded
-    const imageLoaded = new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = (error) => reject(error);
-    });
+  // scaleImage //
 
-    // Set the source of the image to the selected image URL
-    image.src = selectedImage;
-
-    // Wait for the image to load
-    await imageLoaded;
-
-    // Create a canvas element
-    const canvas = document.createElement("canvas");
-
-    // Calculate the scaled dimensions
-    const scaledWidth = image.width * scale;
-    const scaledHeight = image.height * scale;
-
-    // Set the canvas dimensions
-    canvas.width = scaledWidth;
-    canvas.height = scaledHeight;
-
-    // Draw the scaled image on the canvas
-    const context = canvas.getContext("2d");
-
-    if (context) {
-      context.drawImage(image, 0, 0, scaledWidth, scaledHeight);
-    } else {
-      throw new Error("Unable to get 2D context from canvas.");
-    }
-
-    // Return the scaled image as a canvas element
-    return canvas;
-  }
   async function processImageRatio() {
     if (selectedImage) {
       try {
         const scale = scaleRatio; // Specify the desired scale factor
 
         // Call the scaleImage function with the selected image URL
-        const scaledImage = await scaleImage(selectedImage!, scale);
+        const scaledImage = await imageUtil.scale(selectedImage!, scale);
 
         // Call the scaleSelection function with all selections 'areas' and the ratio
-        const newScaledAreas: IArea[] = await scaleSelections(areasBackup, scale);
+        const newScaledAreas: IArea[] = await selectionUtil.scale(areasBackup, scale);
 
         // Update the state with the scaled image
-        setScaledImage(scaledImage.toDataURL()); // Assuming you want to store the scaled image as a data URL
+        setScaledImage(scaledImage!.toDataURL()); // Assuming you want to store the scaled image as a data URL
         setAreas(newScaledAreas);
       } catch (error) {
         console.error("Error scaling image:", error);
@@ -155,88 +121,82 @@ const ImageProcessor = () => {
     }
   }
 
-  async function scaleSelections(selections: IArea[], scale: number): Promise<IArea[]> {
-    return selections.map((selection) => {
-      return {
-        ...selection,
-        x: selection.x * scale,
-        y: selection.y * scale,
-        width: selection.width * scale,
-        height: selection.height * scale,
-      };
-    });
-  }
-
   async function handleSetAreas(newAreas: IArea[]): Promise<void> {
     setAreas(newAreas);
-    setAreasBackup(await scaleSelections(newAreas, scaleRatio));
+    setAreasBackup(await selectionUtil.scale(newAreas, scaleRatio));
   }
 
-  async function processSelectionCrop(x: number, y: number, width: number, height: number) {
+  async function processSelectionCrop(areaNumber: number) {
     try {
-      // Call the downloadCroppedImage function with the selected image URL and crop parameters
-      const newImage: string | undefined = scaledImage && (await imageUtil.rotateImage(scaledImage, degree));
-      const croppedImageBlob = await downloadCroppedImage(
-        newImage!,
-        x / scaleRatio,
-        y / scaleRatio,
-        width / scaleRatio,
-        height / scaleRatio
-      );
+      const isSelection: IArea | null = await selectionUtil.find(areasBackup, areaNumber);
 
-      // Create a download link element
-      const downloadLink = document.createElement("a");
-      downloadLink.href = URL.createObjectURL(croppedImageBlob);
-      downloadLink.download = "cropped_image.png";
+      if (isSelection && selectedImage) {
+        // Downscale the selection
+        const selection: IArea | undefined = await selectionUtil.scale(isSelection, scaleRatio);
+        // Load Original Uploaded Image
+        const image: string | undefined = await imageUtil.rotate(selectedImage, degree);
 
-      // Programmatically click the download link
-      downloadLink.click();
+        if (selection && image) {
+          const croppedImageBlob = await imageUtil.crop(
+            image,
+            selection.x,
+            selection.y,
+            selection.width,
+            selection.height
+          );
 
-      // Clean up the object URL after the download has started
-      URL.revokeObjectURL(downloadLink.href);
+          // Create a download link element
+          const downloadLink = document.createElement("a");
+          downloadLink.href = URL.createObjectURL(croppedImageBlob);
+          downloadLink.download = "cropped_image.png";
 
-      // Update the state with the cropped image
-      // setScaledImage(croppedImage.toDataURL()); // Assuming you want to store the cropped image as a data URL
+          // Programmatically click the download link
+          downloadLink.click();
+
+          // Clean up the object URL after the download has started
+          URL.revokeObjectURL(downloadLink.href);
+        }
+      }
     } catch (error) {
       console.error("Error cropping image:", error);
     }
   }
 
-  function downloadCroppedImage(
-    selectedImage: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ): Promise<Blob> {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
+  // function downloadCroppedImage(
+  //   selectedImage: string,
+  //   x: number,
+  //   y: number,
+  //   width: number,
+  //   height: number
+  // ): Promise<Blob> {
+  //   return new Promise((resolve, reject) => {
+  //     const image = new Image();
 
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
+  //     image.onload = () => {
+  //       const canvas = document.createElement("canvas");
+  //       canvas.width = width;
+  //       canvas.height = height;
 
-        const context = canvas.getContext("2d");
-        if (context) {
-          context.drawImage(image, x, y, width, height, 0, 0, width, height);
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error("Unable to create Blob."));
-            }
-          });
-        } else {
-          reject(new Error("Unable to get 2D context from canvas."));
-        }
-      };
+  //       const context = canvas.getContext("2d");
+  //       if (context) {
+  //         context.drawImage(image, x, y, width, height, 0, 0, width, height);
+  //         canvas.toBlob((blob) => {
+  //           if (blob) {
+  //             resolve(blob);
+  //           } else {
+  //             reject(new Error("Unable to create Blob."));
+  //           }
+  //         });
+  //       } else {
+  //         reject(new Error("Unable to get 2D context from canvas."));
+  //       }
+  //     };
 
-      image.onerror = (error) => reject(error);
+  //     image.onerror = (error) => reject(error);
 
-      image.src = selectedImage;
-    });
-  }
+  //     image.src = selectedImage;
+  //   });
+  // }
 
   // Call the function when the selectedImage or Ratio changes //
   useEffect(() => {

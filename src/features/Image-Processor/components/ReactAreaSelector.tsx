@@ -1,8 +1,4 @@
-import {
-  AreaSelector,
-  IArea,
-  IAreaRendererProps,
-} from "@bmunozg/react-image-area";
+import { AreaSelector, IArea, IAreaRendererProps } from "@bmunozg/react-image-area";
 import { useCallback, useEffect, useState } from "react";
 import ContextMenu from "./ContextMenu";
 import "../styles/ReactAreaSelector.css";
@@ -10,17 +6,12 @@ import { motion } from "framer-motion";
 
 type props = {
   image: string | undefined;
-  downloadSelection(x: number, y: number, width: number, height: number): void;
+  downloadSelection(areaNumber: number): void;
   areas: IArea[];
   setAreas(areas: IArea[]): void;
 };
 
-export default function ReactAreaSelector({
-  image,
-  downloadSelection,
-  areas,
-  setAreas,
-}: props) {
+export default function ReactAreaSelector({ image, downloadSelection, areas, setAreas }: props) {
   const [activeArea, setActiveArea] = useState<number | null>(null);
   const selectionMinWidth: number = 80;
   const selectionMinHeight: number = 40;
@@ -31,10 +22,8 @@ export default function ReactAreaSelector({
     // DEFAULT ACTIONS AFTER MARKING AN AREA //
 
     // minHeight % minWeight check
-    if (a[a.length - 1].height < selectionMinHeight)
-      a[a.length - 1].height = selectionMinHeight;
-    if (a[a.length - 1].width < selectionMinWidth)
-      a[a.length - 1].width = selectionMinWidth;
+    if (a[a.length - 1].height < selectionMinHeight) a[a.length - 1].height = selectionMinHeight;
+    if (a[a.length - 1].width < selectionMinWidth) a[a.length - 1].width = selectionMinWidth;
     // . //
 
     // . . . //
@@ -50,9 +39,7 @@ export default function ReactAreaSelector({
   }
 
   const handleDelete = (areaNumber: number): void => {
-    const newAreas: IArea[] = areas.filter(
-      (area, index) => index != areaNumber - 1
-    );
+    const newAreas: IArea[] = areas.filter((area, index) => index != areaNumber - 1);
     setAreas(newAreas);
   };
 
@@ -72,27 +59,13 @@ export default function ReactAreaSelector({
 
     if (!areaProps.isChanging) {
       return (
-        <div
-          key={areaProps.areaNumber}
-          className="selectedArea"
-          onBlur={() => alert(100)}
-        >
-          <div
-            className="blank"
-            onClick={() => handleActiveArea(areaProps.areaNumber - 1)}
-          />
+        <div key={areaProps.areaNumber} className="selectedArea" onBlur={() => alert(100)}>
+          <div className="blank" onClick={() => handleActiveArea(areaProps.areaNumber - 1)} />
           {areaProps.areaNumber - 1 === activeArea && (
             <ContextMenu
               handleDelete={() => handleDelete(areaProps.areaNumber)}
               info={areaProps}
-              downloadSelection={() =>
-                downloadSelection(
-                  areaProps.x,
-                  areaProps.y,
-                  areaProps.width,
-                  areaProps.height
-                )
-              }
+              downloadSelection={() => downloadSelection(--areaProps.areaNumber)}
             />
           )}
         </div>

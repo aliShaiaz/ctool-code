@@ -41,9 +41,8 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
 
     // Rotation Monitoring //
     if (degree != prevDegree) {
-      console.log(degree);
       this.props.rotate(degree);
-      // this.setState({ degree: 0 });
+      this.props.setDegree(degree);
     }
     // . . . //
   }
@@ -62,7 +61,7 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
   };
 
   handleRotateRight = () => {
-    this.props.rotate90;
+    this.props.rotate90();
   };
 
   handleClearCanvas = () => {
