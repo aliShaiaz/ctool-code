@@ -32,29 +32,34 @@ const ImageProcessor = () => {
     setDegree(newDegree);
   }
 
+  async function rotate90() {
+    if (selectedImage)
+      try {
+        const promises: Promise<string | undefined>[] = [];
+
+        promises.push(imageUtil.rotateImage(selectedImage, 90));
+        if (scaledImage) {
+          promises.push(imageUtil.rotateImage(scaledImage, 90));
+        }
+
+        const [rotatedSelectedImage, rotatedScaledImage] = await Promise.all(promises);
+
+        // Handle rotatedSelectedImage and rotatedScaledImage updates
+        if (rotatedSelectedImage) {
+          setSelectedImage(rotatedSelectedImage);
+        }
+        if (rotatedScaledImage) {
+          setScaledImage(rotatedScaledImage);
+        }
+      } catch (error) {
+        console.error("Error rotating 90 deg right: ", error);
+      }
+  }
+
   async function rotate(degrees: number) {
     if (selectedImage) {
       try {
-        if (degrees == 90) {
-          const promises: Promise<string | undefined>[] = [];
-
-          promises.push(imageUtil.rotateImage(selectedImage, degrees));
-          if (scaledImage) {
-            promises.push(imageUtil.rotateImage(scaledImage, degrees));
-          }
-
-          const [rotatedSelectedImage, rotatedScaledImage] = await Promise.all(promises);
-
-          // Handle rotatedSelectedImage and rotatedScaledImage updates
-          if (rotatedSelectedImage) {
-            setSelectedImage(rotatedSelectedImage);
-          }
-          if (rotatedScaledImage) {
-            setScaledImage(rotatedScaledImage);
-          }
-        } else {
-          setScaledImage(await imageUtil.rotateImage(selectedImage, degrees));
-        }
+        setScaledImage(await imageUtil.rotateImage(selectedImage, degrees));
       } catch (error) {
         console.error("Error rotating:", error);
       }
@@ -89,6 +94,8 @@ const ImageProcessor = () => {
       reader.readAsDataURL(file);
     }
   }
+
+  // To Optimize // // // // // // // // //
   async function scaleImage(selectedImage: string, scale: number): Promise<HTMLCanvasElement> {
     // Create a new image element
     const image = new Image();
@@ -128,7 +135,6 @@ const ImageProcessor = () => {
     // Return the scaled image as a canvas element
     return canvas;
   }
-
   async function processImageRatio() {
     if (selectedImage) {
       try {
@@ -263,6 +269,7 @@ const ImageProcessor = () => {
               getDegree={view_degree}
               setDegree={update_degree}
               rotate={rotate}
+              rotate90={rotate90}
               clearSelection={clearSelection}
               clearCanvas={clearCanvas}
             />

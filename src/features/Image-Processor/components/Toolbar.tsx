@@ -10,6 +10,7 @@ interface ToolbarProps {
   setDegree(newRatio: number): void;
 
   rotate(degree: number): void;
+  rotate90(): void;
   clearSelection(): void;
   clearCanvas(): void;
 }
@@ -28,11 +29,7 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
     };
   }
 
-  componentDidUpdate(
-    prevProps: Readonly<ToolbarProps>,
-    prevState: Readonly<ToolbarState>,
-    snapshot?: any
-  ) {
+  componentDidUpdate(prevProps: Readonly<ToolbarProps>, prevState: Readonly<ToolbarState>, snapshot?: any) {
     const { ratio, degree } = this.state;
     const { ratio: prevRatio, degree: prevDegree } = prevState;
 
@@ -65,7 +62,7 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
   };
 
   handleRotateRight = () => {
-    this.props.rotate(90);
+    this.props.rotate90;
   };
 
   handleClearCanvas = () => {
@@ -104,12 +101,7 @@ class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
           <img title="Reset Selection" className="icon" src={CustomIcons.Reset} alt="Reset" />
         </button>
         <button className="btn-icon" onClick={this.handleRotateRight}>
-          <img
-            title="Rotate Right"
-            className="icon"
-            src={CustomIcons.RotateRight}
-            alt="Rotate-Right"
-          />
+          <img title="Rotate Right" className="icon" src={CustomIcons.RotateRight} alt="Rotate-Right" />
         </button>
         <button id="rmImg" className="btn-icon hoverRed" onClick={this.handleClearCanvas}>
           <img title="Remove Image" className="icon" src={CustomIcons.Delete} alt="Remove Image" />
